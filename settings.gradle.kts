@@ -1,3 +1,7 @@
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
+}
+
 rootProject.name = "nuvotifier"
 
 include("nuvotifier-api")
@@ -15,8 +19,8 @@ include("nuvotifier-sponge")
 project(":nuvotifier-sponge").projectDir = file("sponge")
 include("nuvotifier-fabric")
 project(":nuvotifier-fabric").projectDir = file("fabric")
-include("nuvotifier-velocity")
-project(":nuvotifier-velocity").projectDir = file("velocity")
+//include("nuvotifier-velocity")
+//project(":nuvotifier-velocity").projectDir = file("velocity")
 
-include("nuvotifier-universal")
-project(":nuvotifier-universal").projectDir = file("universal")
+//include("nuvotifier-universal")
+//project(":nuvotifier-universal").projectDir = file("universal")

@@ -4,14 +4,14 @@ plugins {
     `java-library`
 }
 
-applyPlatformAndCoreConfiguration()
+applyPlatformAndCoreConfiguration(javaRelease = 21)
 applyCommonArtifactoryConfig()
 applyShadowConfiguration()
 
 repositories {
     maven {
         name = "paper"
-        url = uri("https://papermc.io/repo/repository/maven-public/")
+        url = uri("https://repo.papermc.io/repository/maven-public/")
     }
 }
 
@@ -20,7 +20,7 @@ configurations {
 }
 
 dependencies {
-    "compileOnly"("io.papermc.paper:paper-api:1.18.2-R0.1-SNAPSHOT")
+    "compileOnly"("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
     "api"(project(":nuvotifier-api"))
     "api"(project(":nuvotifier-common"))
 }

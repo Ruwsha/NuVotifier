@@ -21,7 +21,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.concurrent.FastThreadLocalThread;
-import io.netty.util.concurrent.GlobalEventExecutor;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -70,18 +69,27 @@ public class VotifierServerBootstrap {
     public void start(Consumer<Throwable> error) {
         Objects.requireNonNull(error, "error");
 
+        // 投票データを受信した際の実処理を行うハンドラを作成
         VoteInboundHandler voteInboundHandler = new VoteInboundHandler(plugin);
 
         new ServerBootstrap()
+                // Epoll(Linux向け高速版)が使える場合はそちらを使用し、そうでなければ標準のNIOを使用
                 .channel(USE_EPOLL ? EpollServerSocketChannel.class : NioServerSocketChannel.class)
                 .group(bossLoopGroup, eventLoopGroup)
+                // クライアントからの新しい接続があったときの初期化処理
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel channel) {
+                        // セッション情報とプラグインインスタンスをChannelの属性として保存
                         channel.attr(VotifierSession.KEY).set(new VotifierSession());
                         channel.attr(VotifierPlugin.KEY).set(plugin);
+
+                        // 通信パイプライン (処理の流れ) を構築
+                        // 1. 接続直後の挨拶 (VOTIFIER <version>) を送信
                         channel.pipeline().addLast("greetingHandler", VotifierGreetingHandler.INSTANCE);
+                        // 2. プロトコルのバージョン (v1/v2) を判別し、適切なデコーダーへ振り分け
                         channel.pipeline().addLast("protocolDifferentiator", new VotifierProtocolDifferentiator(false, !v1Disable));
+                        // 3. 解読された投票データ (Voteオブジェクト) を受け取り、プラグイン側へ通知
                         channel.pipeline().addLast("voteHandler", voteInboundHandler);
                     }
                 })

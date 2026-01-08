@@ -6,31 +6,33 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.concurrent.TimeUnit;
 
-class BukkitScheduler implements VotifierScheduler {
+final class BukkitScheduler implements VotifierScheduler {
     private final NuVotifierBukkit plugin;
 
-    public BukkitScheduler(NuVotifierBukkit plugin) {
+    BukkitScheduler(final NuVotifierBukkit plugin) {
         this.plugin = plugin;
     }
 
-    private int toTicks(int time, TimeUnit unit) {
+    private static int toTicks(final int time, final TimeUnit unit) {
         return (int) (unit.toMillis(time) / 50);
     }
 
     @Override
-    public ScheduledVotifierTask delayedOnPool(Runnable runnable, int delay, TimeUnit unit) {
-        return new BukkitTaskWrapper(plugin.getServer().getScheduler().runTaskLaterAsynchronously(plugin, runnable, toTicks(delay, unit)));
+    public ScheduledVotifierTask delayedOnPool(final Runnable runnable, final int delay, final TimeUnit unit) {
+        return new BukkitTaskWrapper(plugin.getServer().getScheduler()
+                .runTaskLaterAsynchronously(plugin, runnable, toTicks(delay, unit)));
     }
 
     @Override
-    public ScheduledVotifierTask repeatOnPool(Runnable runnable, int delay, int repeat, TimeUnit unit) {
-        return new BukkitTaskWrapper(plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, runnable, toTicks(delay, unit), toTicks(repeat, unit)));
+    public ScheduledVotifierTask repeatOnPool(final Runnable runnable, final int delay, final int repeat, final TimeUnit unit) {
+        return new BukkitTaskWrapper(plugin.getServer().getScheduler()
+                .runTaskTimerAsynchronously(plugin, runnable, toTicks(delay, unit), toTicks(repeat, unit)));
     }
 
-    private static class BukkitTaskWrapper implements ScheduledVotifierTask {
+    private static final class BukkitTaskWrapper implements ScheduledVotifierTask {
         private final BukkitTask task;
 
-        private BukkitTaskWrapper(BukkitTask task) {
+        BukkitTaskWrapper(final BukkitTask task) {
             this.task = task;
         }
 
@@ -40,3 +42,4 @@ class BukkitScheduler implements VotifierScheduler {
         }
     }
 }
+
